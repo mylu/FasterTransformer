@@ -617,7 +617,7 @@ void ParallelGpt<T>::forward(std::unordered_map<std::string, Tensor>*       outp
     // complete this step.
     // When there is no input_ids, put the start token at step 0 of output_ids_buf_. After forward, only copy
     // the step 1 ~ max_output_seq_len of output_ids_buf_ to output_tensors->at(0).data
-
+    
     FT_LOG_DEBUG("%s start", __PRETTY_FUNCTION__);
     FT_CHECK_WITH_INFO(input_tensors->size() >= 3, "input_tensors->size() >= 3");
     FT_CHECK_WITH_INFO(output_tensors->size() >= 2, "output_tensors->size() >= 2");
@@ -632,6 +632,7 @@ void ParallelGpt<T>::forward(std::unordered_map<std::string, Tensor>*       outp
 
     // Used when inputs do not contain random_seed
     const size_t batch_size = output_tensors->at("output_ids").shape[0];
+    
     const size_t beam_width = output_tensors->at("output_ids").shape[1];
     FT_CHECK_WITH_INFO(output_tensors->count("cum_log_probs") == 0
                            || output_tensors->at("cum_log_probs").size() == batch_size * beam_width,
@@ -641,6 +642,7 @@ void ParallelGpt<T>::forward(std::unordered_map<std::string, Tensor>*       outp
     bool       continue_gen = input_tensors->find("continue_gen") != input_tensors->end() ?
                                   input_tensors->at("continue_gen").getVal<bool>() :
                                   false;
+    
     const bool is_return_context_embeddings =
         input_tensors->find("is_return_context_embeddings") != input_tensors->end()
         && input_tensors->at("is_return_context_embeddings").getVal<bool>();
@@ -853,6 +855,7 @@ void ParallelGpt<T>::forward(std::unordered_map<std::string, Tensor>*       outp
         POP_RANGE;
     }
     else {
+        
         // TODO(bhsueh) Initilaize them in one kernel
         // initialize the output ids and parent ids
         PUSH_RANGE("initialize output and parent ids");
@@ -1077,7 +1080,8 @@ void ParallelGpt<T>::forward(std::unordered_map<std::string, Tensor>*       outp
                  {"value_cache", Tensor(MEMORY_GPU, data_type, self_v_cache_shape, value_cache_)},
                  {"last_token_hidden_units",
                   Tensor(MEMORY_GPU, data_type, {batch_size * beam_width, hidden_units_}, decoder_output_buf_)}});
-
+            std::cout << "[WASSIM - FORWARD] => here2? => "<< std::endl;
+            std::flush(std::cout);
             gpt_context_decoder_->forward(
                 &decoder_output_tensors, &decoder_input_tensors, &gpt_weights->decoder_layer_weights);
 
@@ -1327,7 +1331,8 @@ void ParallelGpt<T>::forward(std::unordered_map<std::string, Tensor>*       outp
                              decoder_output_buf_ + hidden_units_offset)},
                      {"key_cache", Tensor(MEMORY_GPU, data_type, self_k_cache_shape, key_cache_)},
                      {"value_cache", Tensor(MEMORY_GPU, data_type, self_v_cache_shape, value_cache_)}});
-
+                std::cout << "[WASSIM - FORWARD] => here3? => "<< std::endl;
+                std::flush(std::cout);
                 gpt_decoder_->forward(
                     &decoder_output_tensors, &decoder_input_tensors, &gpt_weights->decoder_layer_weights);
             }

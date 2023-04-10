@@ -322,7 +322,8 @@ void ParallelGptContextDecoder<T>::forward(
     // To use layer/pipeline parallelism, we view the shape of 'batch_size' to 'ite * local_batch_size'.
     // For example, the shape of decoder_input becomes [ite, batch_size, seq_len, hidden_dimension] during
     // computing.
-
+    
+    std::flush(std::cout);
     FT_LOG_DEBUG("%s start", __PRETTY_FUNCTION__);
     FT_CHECK(input_tensors->isExist("decoder_input"));
     FT_CHECK(input_tensors->isExist("attention_mask"));
@@ -404,6 +405,7 @@ void ParallelGptContextDecoder<T>::forward(
 
     PUSH_RANGE("context_generation");
     for (uint ite = 0; ite < iteration_num; ite++) {
+        
         size_t h_token_num = local_batch_size * seq_len;
         if (is_unpadded_mha) {
             const int* base_input_lengths =
@@ -541,7 +543,7 @@ void ParallelGptContextDecoder<T>::forward(
                  Tensor{MEMORY_GPU, activation_out_type, {h_token_num, hidden_units_}, self_attn_output_}},
                 {"key_cache", Tensor{MEMORY_GPU, data_type, self_k_cache_size, k_cache_ptr}},
                 {"value_cache", Tensor{MEMORY_GPU, data_type, self_v_cache_size, v_cache_ptr}}};
-
+            
             self_attention_layer_->forward(
                 &self_attention_output_tensors, &self_attention_input_tensors, &layer_weight->self_attention_weights);
 
