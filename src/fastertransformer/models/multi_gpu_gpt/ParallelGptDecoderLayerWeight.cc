@@ -279,7 +279,7 @@ void ParallelGptDecoderLayerWeight<T>::loadModel(std::string dir_path, FtCudaDat
     loadWeightFromBin<T>(weights_ptr[0], {hidden_units_}, dir_path + ".input_layernorm.bias.bin", model_file_type);
     loadWeightFromBin<T>(weights_ptr[1], {hidden_units_}, dir_path + ".input_layernorm.weight.bin", model_file_type);
     loadWeightFromBin<T>(weights_ptr[3],
-                         {2, hidden_units_ / tensor_para_size_},
+                         {1, hidden_units_ / tensor_para_size_},
                          dir_path + ".attention.query_key_value.bias." + std::to_string(tensor_para_rank_) + ".bin",
                          model_file_type);
     loadWeightFromBin<T>(weights_ptr[5], {hidden_units_}, dir_path + ".attention.dense.bias.bin", model_file_type);
