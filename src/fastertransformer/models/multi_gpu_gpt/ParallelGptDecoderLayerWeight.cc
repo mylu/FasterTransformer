@@ -319,7 +319,7 @@ void ParallelGptDecoderLayerWeight<T>::loadModel(std::string dir_path, FtCudaDat
     // Load weights for GPT
     if (int8_mode_ == 0) {
         loadWeightFromBin<T>(weights_ptr[2],
-                             {hidden_units_, 2 * hidden_units_ / tensor_para_size_},
+                             {hidden_units_, 1 * hidden_units_ / tensor_para_size_},
                              dir_path + ".attention.query_key_value.weight." + std::to_string(tensor_para_rank_)
                                  + ".bin",
                              model_file_type);
