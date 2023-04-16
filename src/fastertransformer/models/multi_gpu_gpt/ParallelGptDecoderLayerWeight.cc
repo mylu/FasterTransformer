@@ -275,6 +275,7 @@ template<typename T>
 void ParallelGptDecoderLayerWeight<T>::loadModel(std::string dir_path, FtCudaDataType model_file_type)
 {
     FT_CHECK(is_maintain_buffer == true);
+    std::cout << "Starting to load model from " << dir_path << "with int8_mode_" << int8_mode_ <<  std::endl;
     
     loadWeightFromBin<T>(weights_ptr[0], {hidden_units_}, dir_path + ".input_layernorm.bias.bin", model_file_type);
     loadWeightFromBin<T>(weights_ptr[1], {hidden_units_}, dir_path + ".input_layernorm.weight.bin", model_file_type);
